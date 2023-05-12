@@ -19,8 +19,8 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'send-email-every-day-at-10': {
         'task': 'applications.tasks.tasks.send_mail_func',
-        # 'schedule': crontab(hour=10, minute=30, day_of_week=3),
-        'schedule': crontab(hour='*', minute='*'),
+        'schedule': crontab(hour=10, minute=30, day_of_week=1),
+        
     },
 }
 
