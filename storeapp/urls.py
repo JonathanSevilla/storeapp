@@ -15,8 +15,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+# from oauth2_provider.views import TokenView, AuthorizationView
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api-auth/', include('rest_framework.urls')),
+    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    # path('o/token/', TokenView.as_view(), name='token'),
+    # path('o/authorize/', AuthorizationView.as_view(), name='authorize'),
     path('', include('applications.tasks.urls')),
-]
+    path('', include('applications.store.urls')),
+    path('', include('applications.register.urls')),
+    
+]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

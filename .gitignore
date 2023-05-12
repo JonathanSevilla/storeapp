@@ -1,3 +1,60 @@
 env/
 migrations/
 __pycache__/
+
+*.sqlite3
+# Data Files
+*.csv
+*.xlsx
+*.feather
+*.pickle
+*.json
+*.sqlite3
+*.db
+
+# Compressed Files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# OS Generated Files
+.Spotlight-V100
+*.Identifier
+ehthumbs.db
+desktop.ini
+.DS_Store?
+.DS_Store
+Thumbs.db
+.Trashes
+Icon?
+._*
+
+# Python Files
+.ipynb_checkpoints/
+profile_default/
+__pycache__/
+*.py[cod]
+*.so
+*.log
+*.pot
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Editors
+.idea/
+
+# Migrations
+migrations/
+barcodes/

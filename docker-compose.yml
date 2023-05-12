@@ -1,0 +1,46 @@
+version: "3.8"
+   
+services:
+    django:
+        build: .
+        container_name: storeapp
+        command: python manage.py runserver 0.0.0.0:80
+        volumes:
+            - .:/usr/src/app/
+        ports:
+            - "8000:8000"
+        environment:
+            - DEBUG=1
+            - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+            - CELERY_BROKER=redis://redis:6379/0
+            - CELERY_BACKEND=redis://redis:6379/0
+        depends_on:
+            - pgdb
+            - redis
+    celery:
+        build: .
+        command: celery -A storeapp worker -l INFO
+        volumes:
+            - .:/usr/src/app
+        environment:
+            - DEBUG=1
+            - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+            - CELERY_BROKER=redis://redis:6379/0
+            - CELERY_BACKEND=redis://redis:6379/0
+        depends_on:
+            - django
+            - redis
+    pgdb:
+        image: postgres
+        container_name: pgdb
+        environment:
+            - POSTGRES_DB=storedb
+            - POSTGRES_USER=admindb
+            - POSTGRES_PASSWORD=Honduras2023.
+        volumes:
+            - pgdata:/var/lib/postgresql/data/
+    redis:
+        image: "redis:alpine"
+        
+volumes:
+  pgdata:

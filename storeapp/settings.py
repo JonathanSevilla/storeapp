@@ -9,9 +9,8 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
-# from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +25,8 @@ SECRET_KEY = 'django-insecure-ynmjbrf#12d5z1e-%k$k-=g^bq&ekgam-(tc4w&@k*a2#r0w6d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Application definition
@@ -39,14 +39,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'applications.tasks',
+    'applications.store',
+    'applications.register',
     'celery',
     'django_celery_beat',
-    # 'kombu.transport.django',
+    'django_celery_results',    
+    'rest_framework',
+    'oauth2_provider',
+    'corsheaders',
+    'django_filters',
+    'django_otp',    
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -78,10 +88,56 @@ WSGI_APPLICATION = 'storeapp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+'''
+AUTHENTICATION_BACKENDS = [
+    'oauth2_provider.backends.OAuth2Backend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Define el modelo de la aplicación OAuth2
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'register.OAuth2Application'
+
+# Define el backend de autenticación OAuth2
+AUTHENTICATION_BACKENDS = [
+    'oauth2_provider.backends.OAuth2Backend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Define el método de autenticación
+AUTHENTICATION_METHOD = 'user.backends.EmailOTPBackend'
+'''
+
+
+
+
+OIDC_KEY = Path(str(BASE_DIR) + "/oidc.key").read_text()
+
+OAUTH2_PROVIDER = {
+    "OIDC_ENABLED": True,
+    "OIDC_RSA_PRIVATE_KEY": OIDC_KEY,
+    "SCOPES": {"all": "all scopes"},
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    ),
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    # ]
+}
+
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'storedb',
+        'USER': 'admindb',
+        'PASSWORD': 'Honduras2023.',
+        'HOST': 'storedb.postgres.database.azure.com',
+        'PORT': '5432',
+        'OPTIONS': {'sslmode': 'require'}
     }
 }
 
@@ -105,15 +161,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# CELERY_BEAT_SCHEDULE = {
-#     'send-email-every-day': {
-#         'task': 'tasks.send_email',
-#         'schedule': crontab(hour=8, minute=0),
-#         'args': ('Subject line', 'Message body', ['recipient@example.com']),
-#     },
-# }
-
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -131,21 +178,39 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
+STATIC_DIR = BASE_DIR / 'Client/build/static'
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    STATIC_DIR
+]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CELERY_BROKER_URL = 'redis://127.0.0.1'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'correoprueba035@gmail.com'
+EMAIL_HOST_PASSWORD = 'jjduojjtpjjwymbe'
 
-#: Only add pickle to this list if your broker is secured
-#: from unwanted access (see userguide/security.html)
-CELERY_ACCEPT_CONTENT = ['applications/json']
-CELERY_RESULT_SERIALIZER = 'json'
+CELERY_BROKER_URL = 'redis://localhost:6379'
+
+CELERY_ACCEPT_CONTENT = ['json']
+
 CELERY_TASK_SERIALIZER = 'json'
 
-# database 
-CELERY_RESULT_BACKEND = "django-db"
+CELERY_TIMEZONE = 'America/Tegucigalpa'
+
+CELERY_RESULT_BACKEND = 'django-db'
+
+#CELERY BEAT
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+LOGIN_URL='/admin/login/'
