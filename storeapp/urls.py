@@ -24,8 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    # path('o/token/', TokenView.as_view(), name='token'),
-    # path('o/authorize/', AuthorizationView.as_view(), name='authorize'),
     path('', include('applications.tasks.urls')),
     path('', include('applications.store.urls')),
     path('', include('applications.register.urls')),
