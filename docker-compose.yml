@@ -19,7 +19,7 @@ services:
             - redis
     celery:
         build: .
-        command: celery -A storeapp worker -l INFO
+        command: bash -c "celery -A storeapp worker -l info && celery -A storeapp beat -l INFO"
         volumes:
             - .:/usr/src/app
         environment:
