@@ -29,7 +29,7 @@ python manage.py runserver
 
 ### Para usarlo desde Docker, ejecute los siguientes comandos:
 ```
-docker build -t storeapp_django .
+docker build -t storeapp .
 docker-compose up
 ```
 
