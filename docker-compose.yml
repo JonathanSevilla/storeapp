@@ -19,7 +19,20 @@ services:
             - redis
     celery:
         build: .
-        command: bash -c "celery -A storeapp beat -l INFO && celery -A storeapp worker -l info"
+        command: bash -c "celery -A storeapp worker -l info"
+        volumes:
+            - .:/usr/src/app
+        environment:
+            - DEBUG=1
+            - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+            - CELERY_BROKER=redis://redis:6379/0
+            - CELERY_BACKEND=redis://redis:6379/0
+        depends_on:
+            - django
+            - redis
+    celerybeat:
+        build: .
+        command: bash -c "celery -A storeapp beat -l INFO"
         volumes:
             - .:/usr/src/app
         environment:
